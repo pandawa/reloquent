@@ -20,6 +20,8 @@ use RuntimeException;
  */
 abstract class EntityMap extends AbstractModel
 {
+    public $incrementing = false;
+
     protected static ?string $entity = null;
     protected mixed $lastEntity;
 
