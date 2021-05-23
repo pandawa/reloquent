@@ -11,6 +11,7 @@ use Pandawa\Component\Ddd\Relationship\BelongsTo;
 use Pandawa\Component\Ddd\Relationship\HasMany;
 use Pandawa\Reloquent\Collection;
 use Pandawa\Reloquent\Contract\Mappable as MappableContract;
+use Pandawa\Reloquent\Entity\Entity;
 use ReflectionClass;
 use ReflectionObject;
 use ReflectionProperty;
@@ -168,7 +169,13 @@ trait Mappable
         $relation = $this->entityMap->{$key}();
 
         if (!$value instanceof LaravelCollection) {
-            if (!$value instanceof MappableContract) {
+            if ($value instanceof Entity && !$value instanceof MappableContract) {
+                $mapperClass = sprintf('%sMap', get_class($value));
+                $mappedClass = $mapperClass::getMappedClass();
+
+                $value = $mappedClass::hydrateFromEntity($value);
+                $value = $value->getMappedModel();
+            } elseif (null !== $value && !$value instanceof MappableContract) {
                 throw new InvalidArgumentException('Value should be an entity.');
             }
 
