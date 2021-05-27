@@ -155,7 +155,13 @@ trait Mappable
             return $this->relations[$key];
         }
 
-        return $this->entityMap->{$key};
+        $value = $this->entityMap->{$key};
+
+        if ($value instanceof EntityMap) {
+            $value = $value->hydrateToEntity();
+        }
+
+        return $value;
     }
 
     protected function hasRelation(string $key): bool
