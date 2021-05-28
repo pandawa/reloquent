@@ -17,13 +17,6 @@ class Collection extends BaseCollection
     protected array $newItems = [];
     protected array $pendingRemovedItems = [];
 
-    public function __construct($items = [])
-    {
-        foreach ($this->getArrayableItems($items) as $item) {
-            $this->add($item);
-        }
-    }
-
     public function add($item)
     {
         if ($item instanceof Mappable) {
@@ -32,12 +25,8 @@ class Collection extends BaseCollection
             return parent::add($item);
         }
 
-        if ($item instanceof Entity) {
-            $mappedEntityClass = $this->getMappedEntityClass($item);
-            $item = $mappedEntityClass::hydrateFromEntity($item);
-
-            $this->newItems[] = $item;
-        }
+        $item = $this->mapIfPossible($item);
+        $this->newItems[] = $item;
 
         return parent::add($item);
     }
@@ -74,6 +63,17 @@ class Collection extends BaseCollection
     public function clearNewItems(): void
     {
         $this->newItems = [];
+    }
+
+    private function mapIfPossible($item): mixed
+    {
+        if ($item instanceof Entity && !$item instanceof Mappable) {
+            $mappedEntityClass = $this->getMappedEntityClass($item);
+
+            return $mappedEntityClass::hydrateFromEntity($item);
+        }
+
+        return $item;
     }
 
     private function getMappedEntityClass($entity): string
