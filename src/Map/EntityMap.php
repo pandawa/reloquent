@@ -140,7 +140,7 @@ abstract class EntityMap extends AbstractModel
 
     protected function createEntity($map)
     {
-        $entity = EntityMapper::create()->createEntity(static::getEntity());
+        $entity = EntityMapper::create()->createEntity(static::getEntity(), false);
 
         $this->validateEntity($entity);
 

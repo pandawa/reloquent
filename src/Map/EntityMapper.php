@@ -22,11 +22,16 @@ class EntityMapper
         return new static(new Filesystem(), base_path('bootstrap/cache/entities'));
     }
 
-    public function createEntity(string $entityClass): MappableContract
+    public function createEntity(string $entityClass, bool $withConstructor = true): MappableContract
     {
         $className = $this->createClassIfNeeded($entityClass);
+        $reflectionClass = new \ReflectionClass($className);
 
-        return new $className();
+        if ($withConstructor) {
+            return $reflectionClass->newInstance();
+        }
+
+        return $reflectionClass->newInstanceWithoutConstructor();
     }
 
     public function createClassIfNeeded(string $entityClass): string
