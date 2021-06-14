@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as LaravelCollection;
 use InvalidArgumentException;
 use Pandawa\Component\Ddd\Relationship\BelongsTo;
+use Pandawa\Component\Ddd\Relationship\BelongsToMany;
 use Pandawa\Component\Ddd\Relationship\HasMany;
 use Pandawa\Reloquent\Collection;
 use Pandawa\Reloquent\Contract\Mappable as MappableContract;
@@ -191,15 +192,20 @@ trait Mappable
         }
 
         if ($value instanceof Collection) {
-            if ($relation instanceof BelongsTo) {
-                $relation->attach($value);
+            if ($relation instanceof BelongsToMany) {
+                $relation->attach(array_map(
+                    function ($model) {
+                        return $model->getKey();
+                    },
+                    $value->getNewItems()
+                ));
             } elseif ($relation instanceof HasMany) {
                 foreach ($value->getNewItems() as $item) {
                     $relation->add($item->getMappedModel());
                 }
-
-                $value->clearNewItems();
             }
+
+            $value->clearNewItems();
         }
     }
 }

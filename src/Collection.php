@@ -19,30 +19,34 @@ class Collection extends BaseCollection
 
     public function add($item)
     {
-        if ($item instanceof Mappable) {
-            $this->newItems[] = $item;
+        $collection = new static($this->items);
+        $collection->newItems = $this->newItems;
+        $collection->pendingRemovedItems = $this->pendingRemovedItems;
 
-            return parent::add($item);
+        if (!$item instanceof Mappable) {
+            $item = $this->mapIfPossible($item);
         }
 
-        $item = $this->mapIfPossible($item);
-        $this->newItems[] = $item;
+        $collection->newItems[] = $item;
 
-        return parent::add($item);
+        $collection->items[] = $item;
+
+        return $collection;
     }
 
     public function remove(Entity $entity): static
     {
-        $index = $this->search(fn (Entity $item) => $item->getId() === $entity->getId());
+        $collection = new static($this->items);
+        $index = $collection->search(fn (Entity $item) => $item->getId() === $entity->getId());
 
         if ($index < 0) {
             throw new InvalidArgumentException(sprintf('Entity with id "%s" is not found.', $entity->getId()));
         }
 
-        $this->pendingRemovedItems[] = $this->items[$index];
-        $this->pull($index);
+        $collection->pendingRemovedItems[] = $collection->items[$index];
+        $collection->pull($index);
 
-        return $this;
+        return $collection;
     }
 
     public function getPendingRemovedItems(): array
