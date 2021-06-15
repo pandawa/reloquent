@@ -19,9 +19,7 @@ class Collection extends BaseCollection
 
     public function add($item)
     {
-        $collection = new static($this->items);
-        $collection->newItems = $this->newItems;
-        $collection->pendingRemovedItems = $this->pendingRemovedItems;
+        $collection = $this->cloneCollection();
 
         if (!$item instanceof Mappable) {
             $item = $this->mapIfPossible($item);
@@ -36,7 +34,8 @@ class Collection extends BaseCollection
 
     public function remove(Entity $entity): static
     {
-        $collection = new static($this->items);
+        $collection = $this->cloneCollection();
+
         $index = $collection->search(fn (Entity $item) => $item->getId() === $entity->getId());
 
         if ($index < 0) {
@@ -45,6 +44,18 @@ class Collection extends BaseCollection
 
         $collection->pendingRemovedItems[] = $collection->items[$index];
         $collection->pull($index);
+
+        return $collection;
+    }
+
+    public function truncate(): static
+    {
+        $collection = $this->cloneCollection();
+
+        foreach ($collection->items as $index => $item) {
+            $collection->pendingRemovedItems[] = $collection->items[$index];
+            $collection->pull($index);
+        }
 
         return $collection;
     }
@@ -67,6 +78,15 @@ class Collection extends BaseCollection
     public function clearNewItems(): void
     {
         $this->newItems = [];
+    }
+
+    protected function cloneCollection(): static
+    {
+        $collection = new static($this->items);
+        $collection->newItems = $this->newItems;
+        $collection->pendingRemovedItems = $this->pendingRemovedItems;
+
+        return $collection;
     }
 
     private function mapIfPossible($item): mixed
