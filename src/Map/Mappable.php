@@ -193,6 +193,13 @@ trait Mappable
 
         if ($value instanceof Collection) {
             if ($relation instanceof BelongsToMany) {
+                $relation->detach(array_map(
+                    function ($model) {
+                        return $model->getKey();
+                    },
+                    $value->getPendingRemovedItems()
+                ));
+
                 $relation->attach(array_map(
                     function ($model) {
                         return $model->getKey();
@@ -200,12 +207,17 @@ trait Mappable
                     $value->getNewItems()
                 ));
             } elseif ($relation instanceof HasMany) {
+                foreach ($value->getPendingRemovedItems() as $removedItem) {
+                    $relation->remove($removedItem->getMappedModel());
+                }
+
                 foreach ($value->getNewItems() as $item) {
                     $relation->add($item->getMappedModel());
                 }
             }
 
             $value->clearNewItems();
+            $value->clearPendingRemovedItems();
         }
     }
 }

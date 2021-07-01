@@ -18,7 +18,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "pandawa/pandawa": "^4.0.8"
+        "pandawa/pandawa": "^4.0.9"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.18",
