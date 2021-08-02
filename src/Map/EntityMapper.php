@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pandawa\Reloquent\Map;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\File;
 use Pandawa\Reloquent\Contract\Mappable as MappableContract;
 
 /**
@@ -12,14 +13,22 @@ use Pandawa\Reloquent\Contract\Mappable as MappableContract;
  */
 class EntityMapper
 {
+    protected bool $cached;
+
     public function __construct(private Filesystem $files, private string $entityPath)
     {
         $this->makeDirectory($this->entityPath);
+        $this->cached = File::exists($this->entityPath . '/.cache');
     }
 
     public static function create(): static
     {
         return new static(new Filesystem(), base_path('bootstrap/cache/entities'));
+    }
+
+    public function getEntityPath(): string
+    {
+        return $this->entityPath;
     }
 
     public function createEntity(string $entityClass, bool $withConstructor = true): MappableContract
@@ -38,13 +47,11 @@ class EntityMapper
     {
         $className = $this->getClassName($entityClass);
 
-        if (!class_exists($className)) {
-            $this->buildClass($entityClass);
-        } else {
-            if (in_array(app()->environment(), ['dev', 'local'])) {
-                $this->buildClass($entityClass);
-            }
+        if ($this->cached) {
+            return $className;
         }
+
+        $this->buildClass($entityClass);
 
         return $className;
     }

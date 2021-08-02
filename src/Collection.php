@@ -10,13 +10,27 @@ use Pandawa\Reloquent\Contract\Mappable;
 use Pandawa\Reloquent\Entity\Entity;
 
 /**
+ * @template T
+ *
  * @author  Iqbal Maulana <iq.bluejack@gmail.com>
  */
 class Collection extends BaseCollection
 {
+    /**
+     * @var array<int, T>
+     */
     protected array $newItems = [];
+
+    /**
+     * @var array<int, T>
+     */
     protected array $pendingRemovedItems = [];
 
+    /**
+     * @param T $item
+     *
+     * @return $this|Collection
+     */
     public function add($item)
     {
         $collection = $this->cloneCollection();
@@ -32,6 +46,11 @@ class Collection extends BaseCollection
         return $collection;
     }
 
+    /**
+     * @param T $entity
+     *
+     * @return $this
+     */
     public function remove(Entity $entity): static
     {
         $collection = $this->cloneCollection();
