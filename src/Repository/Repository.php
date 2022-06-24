@@ -15,12 +15,12 @@ use Pandawa\Reloquent\EntityManager;
  */
 class Repository extends BaseRepository
 {
-    protected EntityManagerInterface $entityManager;
+    protected EntityManagerInterface $em;
 
     public function __construct(Select $select, ORMInterface $orm)
     {
         parent::__construct($select, $orm);
 
-        $this->entityManager = new EntityManager($orm);
+        $this->em = new EntityManager($orm);
     }
 }
