@@ -1,12 +1,13 @@
 {
     "name": "pandawa/reloquent",
     "type": "library",
-    "description": "Data Mapper ORM for Pandawa",
+    "description": "Domain Driven Design (DDD) for Pandawa",
     "keywords": [
         "pandawa",
         "laravel",
         "orm",
-        "eloquent"
+        "eloquent",
+        "ddd"
     ],
     "homepage": "http://github.com/pandawa/reloquent",
     "license": "MIT",
@@ -17,8 +18,9 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
-        "pandawa/pandawa": "^4.0.9"
+        "php": ">=8.1",
+        "pandawa/cycle": "^1.0",
+        "pandawa/pandawa": "^4.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.18",
@@ -53,12 +55,15 @@
         ]
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     },
     "prefer-stable": true,
     "extra": {
         "branch-alias": {
-            "dev-master": "0.x-dev"
+            "dev-master": "2.x-dev"
         },
         "laravel": {
             "providers": [
